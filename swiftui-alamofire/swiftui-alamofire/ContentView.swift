@@ -21,6 +21,7 @@ struct ContentView: View {
                     }
                 }
             }
+            
             .onAppear(perform: {
                 viewModel.input = .getAllProducts
             })
