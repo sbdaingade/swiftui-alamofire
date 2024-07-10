@@ -16,10 +16,25 @@ enum CustomError: Error {
 
 protocol NetworkServiceProtocol {
     static func getPetsData() -> AnyPublisher<Pets,CustomError>
-    
+    static func getPetsTData() -> AnyPublisher<Pets,Error>
 }
 
 public struct NetworkService: NetworkServiceProtocol {
+    static func getPetsTData() -> AnyPublisher<Pets, Error> {
+        let urlData = URL(string: "https://api.npoint.io/89bc67a9845e640ae6ce")
+        return AF.request(urlData!, method: .get)
+            .publishDecodable(type: Pets.self)
+            .tryCompactMap { response in
+                if let error = response.error {
+                    throw error
+                }
+                return response.value
+            }
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    
     static func getPetsData() -> AnyPublisher<Pets, CustomError> {
         let urlData = URL(string: "https://api.npoint.io/89bc67a9845e640ae6ce")
         return AF.request(urlData!, method: .get)

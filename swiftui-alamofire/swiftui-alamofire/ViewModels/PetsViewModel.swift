@@ -23,7 +23,7 @@ class  PetsViewModel: ObservableObject {
         $input.compactMap{$0}.sink {[unowned self] action in
             switch action {
             case .getAllProducts:
-                getData()
+                getDataT()
             }
         }.store(in: &cancellable)
     }
@@ -31,6 +31,21 @@ class  PetsViewModel: ObservableObject {
     private func getData() {
         Task {
             NetworkService.getPetsData().compactMap{$0}.sink { response in
+                switch response {
+                case .finished:
+                    debugPrint("success")
+                case .failure(let error):
+                    debugPrint("\(error.localizedDescription)")
+                }
+            } receiveValue: {[weak self] pets in
+                self?.arrOfProducts = pets.pets
+            }.store(in: &cancellable)
+        }
+    }
+    
+    private func getDataT() {
+        Task {
+            NetworkService.getPetsTData().compactMap{$0}.sink { response in
                 switch response {
                 case .finished:
                     debugPrint("success")
